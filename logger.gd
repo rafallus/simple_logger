@@ -1,12 +1,15 @@
+@tool
+extends Node
 ##
-## Brief description.
+## Logger that can print messages to different outputs.
 ##
 ## Long description.
 ##
-@tool
-extends Node
 
+## LEvel
 enum Level {VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL}
+
+const DEFAULT_LOG_DIR := "user://logs/"
 
 const OUTPUT_MUTE := 0
 const OUTPUT_PRINT := 1
@@ -18,7 +21,10 @@ const _LEVELS := ["VERBOSE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"]
 var _modules := {}
 var _def_module: Module
 var _debug_print_stack := false
-
+var _log_file: FileAccess
+var _console: RichTextLabel
+# TODO:
+# * Give format to console text (and printed one also).
 
 ###############################################################
 ####======= Public Functions ==============================####
@@ -49,25 +55,12 @@ func put(level: Level, message: String, module := &"", error_code := -1) -> void
 				push_error(base_string)
 				print_stack()
 				print_tree()
-	if mod.is_file_output():
-		pass
-	#[Time][DEBUG] Module: Error Message. Custom Message
+	if mod.is_file_output() and _log_file:
+		_log_file.store_line("[%s] %s" \
+			% [Time.get_datetime_string_from_system(false, true), string])
+	if mod.is_console_output() and _console:
+		_console.append_text(string)
 
-	#var output = format(output_format, level, module, message, error_code)
-#
-	#if output_strategy & STRATEGY_PRINT:
-		#print(output)
-#
-	#if output_strategy & STRATEGY_EXTERNAL_SINK:
-		#module_ref.get_external_sink().write(output, level)
-#
-	#if output_strategy & STRATEGY_MEMORY:
-		#memory_buffer[memory_idx] = output
-		#memory_idx += 1
-		#invalid_memory_cache = true
-		#if memory_idx >= max_memory_size:
-			#memory_idx = 0
-			#memory_first_loop = false
 
 func clear_modules() -> void:
 	_modules.clear()
@@ -108,13 +101,17 @@ func set_output_action_console(allow: bool) -> void:
 
 func add_module(module_name: StringName, level := Level.VERBOSE, output := 0) -> void:
 	if _modules.has(module_name):
-		pass
+		pass # TODO: Print warning
 	else:
 		_modules[module_name] = Module.new(level, output)
 
 
 func enable_debug_print_stack(enable: bool) -> void:
 	_debug_print_stack = enable
+
+
+func set_console(console: RichTextLabel) -> void:
+	_console = console
 
 
 ###############################################################
@@ -124,7 +121,7 @@ func _ready() -> void:
 	var def_level: Level = ProjectSettings.get_setting(
 		"addons/simple_logger/output_level", Level.VERBOSE)
 	var def_output: int = ProjectSettings.get_setting(
-		"addons/simple_logger/output_action", OUTPUT_PRINT)
+		"addons/simple_logger/output_action", OUTPUT_PRINT | OUTPUT_FILE)
 	_def_module = Module.new(def_level, def_output)
 	_debug_print_stack = ProjectSettings.get_setting(
 		"addons/simple_logger/print_stack_on_debug", false)
@@ -143,8 +140,16 @@ func __get_module(module_name: StringName) -> Module:
 	else:
 		var mod: Module = _modules.get(module_name)
 		if not mod:
-			pass
+			pass # TODO: Create module with warning?
 		return mod
+
+
+func __open_log_file() -> void:
+	if not Engine.is_editor_hint():
+		# TODO: Give more options to customize file name.
+		var log_path: String = ProjectSettings.get_setting(
+			"addons/simple_logger/log_path", DEFAULT_LOG_DIR + "game.log")
+		_log_file = FileAccess.open(log_path, FileAccess.WRITE)
 
 
 ###############################################################
