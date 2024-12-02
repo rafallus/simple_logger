@@ -379,4 +379,3 @@ func __add_console_message(message: String, module_name: String, level: String, 
 
 # =============================================================
 # ========= Signal Callbacks ==================================
-

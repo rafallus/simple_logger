@@ -36,6 +36,14 @@ func checkerr(err: int, fatal := false, message := "") -> bool:
 	return true
 
 
+func notifyerr(err: int, fatal := false, message := "") -> void:
+	if err != OK:
+		if fatal:
+			Log.fatal(message, err)
+		else:
+			Log.fatal(message, err)
+
+
 func check(arg: bool, message: String, fatal := false) -> bool:
 	if not arg:
 		if fatal:
@@ -101,15 +109,16 @@ func check_resize(err: int) -> void:
 #func CHK_APPEND(failed: bool, action: int = -1) -> void:
 	#if failed:
 		#PRINTERRQ(ERR_OUT_OF_MEMORY, action)
-#
-#
-### Helper function to connect a signal.
-#func CONN(signal_: Signal, callable: Callable, flags: int = 0) -> void:
-	#var err := signal_.connect(callable, flags)
-	#if err != OK and ERROR_DEFAULT_ACTION >= ERROR_NOTIFY_AND_CONTINUE:
-		#printerr("Cannot connect signal %s to method %s." % [signal_.get_name(), callable.get_method()])
-#
-#
+
+
+## Helper function to connect a signal.
+func conn(signal_: Signal, callable: Callable, flags: int = 0) -> void:
+	var err := signal_.connect(callable, flags)
+
+	if err != OK:
+		printerr("Cannot connect signal %s to method %s." % [signal_.get_name(), callable.get_method()])
+
+
 ### Shows a warning if a dictionary element is not found while trying to erase
 ### it.
 ### [codeblock]
