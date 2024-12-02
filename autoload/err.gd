@@ -46,6 +46,11 @@ func check(arg: bool, message: String, fatal := false) -> bool:
 	return true
 
 
+func check_resize(err: int) -> void:
+	if err != OK:
+		Log.fatal("", err)
+
+
 ### Receives an error value and takes an action like printing a message or
 ### quiting the program. If [param action] is equal to -1, the action is
 ### determined by [member error_action]. Returns [code]true[/code] if there was
@@ -81,7 +86,7 @@ func check(arg: bool, message: String, fatal := false) -> bool:
 ### [codeblock]
 ### var new_size := 100
 ### var my_array := []
-### Err.CHK_RSZ(my_array.resize(new_size))
+### Err.checkerr(my_array.resize(new_size))
 ### [/codeblock]
 #func CHK_RSZ(err: int, action: int = -1) -> void:
 	#PRINTERRQ(err, action)
