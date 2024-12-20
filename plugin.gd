@@ -85,6 +85,13 @@ func _enter_tree() -> void:
 			hint_string = "0,64,1,or_greater"
 		})
 		ProjectSettings.set_initial_value(ADDON_PREFIX + "log_file/force_flush", 10)
+	if not ProjectSettings.has_setting(ADDON_PREFIX + "release_options/allow_verbose"):
+		ProjectSettings.set_setting(ADDON_PREFIX + "release_options/allow_verbose", false)
+		ProjectSettings.add_property_info({
+			name = ADDON_PREFIX + "release_options/allow_verbose",
+			type = TYPE_BOOL
+		})
+	ProjectSettings.set_initial_value(ADDON_PREFIX + "release_options/allow_verbose", false)
 	if not ProjectSettings.has_setting(ADDON_PREFIX + "release_options/allow_debug"):
 		ProjectSettings.set_setting(ADDON_PREFIX + "release_options/allow_debug", false)
 		ProjectSettings.add_property_info({
@@ -130,8 +137,8 @@ func _disable_plugin() -> void:
 	ProjectSettings.clear(ADDON_PREFIX + "log_file/name")
 	ProjectSettings.clear(ADDON_PREFIX + "log_file/number_of_logs")
 	ProjectSettings.clear(ADDON_PREFIX + "log_file/force_flush")
+	ProjectSettings.clear(ADDON_PREFIX + "release_options/allow_verbose")
 	ProjectSettings.clear(ADDON_PREFIX + "release_options/allow_debug")
 	ProjectSettings.clear(ADDON_PREFIX + "release_options/allow_info")
 	ProjectSettings.clear(ADDON_PREFIX + "release_options/allow_warning")
 	ProjectSettings.clear(ADDON_PREFIX + "release_options/allow_error")
-

@@ -21,6 +21,7 @@ const OUTPUT_PRINT := 1
 const OUTPUT_FILE := 2
 const OUTPUT_CONSOLE := 4
 const OUTPUT_ALL := 7
+const OUTPUT_DEFAULT := OUTPUT_PRINT
 
 const FORCE_FLUSH := -1
 const NEVER_FLUSH := 0
@@ -122,7 +123,7 @@ func is_console_output() -> bool:
 	return module_is_console_output(DEFAULT_MODULE)
 
 
-func add_module(module_name: StringName, level := Level.VERBOSE, output := 0, log_file := "") -> void:
+func add_module(module_name: StringName, level := Level.VERBOSE, output := OUTPUT_DEFAULT, log_file := "") -> void:
 	if _modules.has(module_name):
 		warning("Tried to add a log module that already existed.", OK, LOGGER_MODULE)
 	else:
@@ -220,7 +221,8 @@ func _ready() -> void:
 		def_module.set_file(log_file)
 	_modules[DEFAULT_MODULE] = def_module
 
-	_allow_verbose = ProjectSettings.get_setting_with_override("debug/settings/stdout/verbose_stdout")
+	_allow_verbose = OS.is_debug_build() or ProjectSettings.get_setting(
+		"addons/simple_logger/release_options/allow_verbose", false)
 	_allow_debug = OS.is_debug_build() or ProjectSettings.get_setting(
 		"addons/simple_logger/release_options/allow_debug", false)
 	_allow_info = OS.is_debug_build() or ProjectSettings.get_setting(
@@ -244,7 +246,7 @@ func __get_module(module_name: StringName) -> LogModule:
 	var mod: LogModule = _modules.get(module_name)
 	if not mod:
 		add_module(module_name)
-		warning("Created module while trying to access inexisting one", OK, LOGGER_MODULE)
+		mod = _modules[module_name]
 	return mod
 
 
@@ -277,11 +279,11 @@ func __get_log_file(path: String) -> FileAccess:
 
 
 func __verbose(mod: LogModule, message: String) -> void:
-	if not _allow_verbose or mod.is_output_allowed(Level.VERBOSE):
+	if not _allow_verbose or not mod.is_output_allowed(Level.VERBOSE):
 		return
 	var m: String = mod.prepend_name(message)
 	if mod.is_print_output():
-		print_verbose(m)
+		print(m)
 	if mod.is_file_output():
 		mod.file.write(m, _force_flush)
 	if mod.is_console_output() and _console:
@@ -289,7 +291,7 @@ func __verbose(mod: LogModule, message: String) -> void:
 
 
 func __debug(mod: LogModule, message: String) -> void:
-	if not _allow_debug or mod.is_output_allowed(Level.DEBUG):
+	if not _allow_debug or not mod.is_output_allowed(Level.DEBUG):
 		return
 	var level := _LEVELS[Level.DEBUG]
 	if mod.is_print_output():
@@ -305,7 +307,7 @@ func __debug(mod: LogModule, message: String) -> void:
 
 
 func __info(mod: LogModule, message: String) -> void:
-	if not _allow_info or mod.is_output_allowed(Level.INFO):
+	if not _allow_info or not mod.is_output_allowed(Level.INFO):
 		return
 	var level := _LEVELS[Level.INFO]
 	if mod.is_print_output():
@@ -319,7 +321,7 @@ func __info(mod: LogModule, message: String) -> void:
 
 
 func __warning(mod: LogModule, message: String) -> void:
-	if not _allow_warn or mod.is_output_allowed(Level.WARN):
+	if not _allow_warn or not mod.is_output_allowed(Level.WARN):
 		return
 	var level := _LEVELS[Level.WARN]
 	if mod.is_print_output():
@@ -332,7 +334,7 @@ func __warning(mod: LogModule, message: String) -> void:
 
 
 func __error(mod: LogModule, message: String) -> void:
-	if not _allow_error or mod.is_output_allowed(Level.ERROR):
+	if not _allow_error or not mod.is_output_allowed(Level.ERROR):
 		return
 	var level := _LEVELS[Level.ERROR]
 	if mod.is_print_output():
@@ -347,7 +349,7 @@ func __error(mod: LogModule, message: String) -> void:
 
 
 func __fatal(mod: LogModule, message: String) -> void:
-	if mod.is_output_allowed(Level.FATAL):
+	if not mod.is_output_allowed(Level.FATAL):
 		return
 	var level := _LEVELS[Level.FATAL]
 	if mod.is_print_output():

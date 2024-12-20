@@ -14,7 +14,7 @@ var _def_benchmark := BenchmarkData.new()
 # =============================================================
 # ========= Public Functions ==================================
 
-func benchmark_start(benchmark: StringName = &"") -> void:
+func start(benchmark: StringName = &"") -> void:
 	var b := __get_benchmark(benchmark)
 	if b.running:
 		pass # Error
@@ -23,7 +23,7 @@ func benchmark_start(benchmark: StringName = &"") -> void:
 	b.last_tick = Time.get_ticks_usec()
 
 
-func benchmark_stop(benchmark: StringName = &"") -> void:
+func stop(benchmark: StringName = &"") -> void:
 	var b := __get_benchmark(benchmark)
 	if not b.running:
 		pass # Error
@@ -33,7 +33,7 @@ func benchmark_stop(benchmark: StringName = &"") -> void:
 	b.reset()
 
 
-func benchmark_pause(benchmark: StringName = &"") -> void:
+func pause(benchmark: StringName = &"") -> void:
 	var b := __get_benchmark(benchmark)
 	if not b.running:
 		pass # Error
