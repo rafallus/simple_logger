@@ -59,6 +59,11 @@ func check_resize(err: int) -> void:
 		Log.fatal("", err)
 
 
+func check_append(arg: bool) -> void:
+	if not arg:
+		Log.error("Can't append element to array.")
+
+
 ### Receives an error value and takes an action like printing a message or
 ### quiting the program. If [param action] is equal to -1, the action is
 ### determined by [member error_action]. Returns [code]true[/code] if there was
