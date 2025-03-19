@@ -136,14 +136,15 @@ func conn(signal_: Signal, callable: Callable, flags: int = 0) -> void:
 #func WARN_DICTERASE(erased: bool, element: String) -> void:
 	#if not erased and ERROR_DEFAULT_ACTION >= ERROR_NOTIFY_AND_CONTINUE:
 		#push_warning("Trying to erase %s element from Dictionary, but it wasn't found." % element)
-#
-#
-### Helper function to open a file.
-#func OPEN_FILE(path: String, flags: int, check_exists: bool = false) -> FileAccess:
+
+
+## Helper function to open a file.
+#func open_file(path: String, flags: int, check_exists: bool = false) -> FileAccess:
 	#if check_exists and not FileAccess.file_exists(path):
-		#PRINTERRQ(ERR_FILE_NOT_FOUND)
+		#Log.error("", ERR_FILE_NOT_FOUND)
 		#return null
 	#var file := FileAccess.open(path, flags)
+	#if
 	#PRINTERRQ(FileAccess.get_open_error())
 	#return file
 
