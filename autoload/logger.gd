@@ -8,7 +8,7 @@ extends Node
 ##
 
 ## Log levels
-enum Level {VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL}
+enum LogLevel {VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL}
 
 ## Default directory where logs will be stored. The directory to be used can be
 ## changed with the setting [code]addons/simple_logger/log_path[/code].
@@ -87,11 +87,11 @@ func fatal(message: String, error_code := OK, module := &"") -> void:
 	__fatal(__get_module(module), m)
 
 
-func set_output_level(new_level: Level) -> void:
+func set_output_level(new_level: LogLevel) -> void:
 	module_set_output_level(DEFAULT_MODULE, new_level)
 
 
-func get_output_level() -> Level:
+func get_output_level() -> LogLevel:
 	return module_get_output_level(DEFAULT_MODULE)
 
 
@@ -123,7 +123,7 @@ func is_console_output() -> bool:
 	return module_is_console_output(DEFAULT_MODULE)
 
 
-func add_module(module_name: StringName, level := Level.VERBOSE, output := OUTPUT_DEFAULT, log_file := "") -> void:
+func add_module(module_name: StringName, level := LogLevel.VERBOSE, output := OUTPUT_DEFAULT, log_file := "") -> void:
 	if _modules.has(module_name):
 		warning("Tried to add a log module that already existed.", OK, LOGGER_MODULE)
 	else:
@@ -141,14 +141,14 @@ func clear_modules() -> void:
 	_modules[DEFAULT_MODULE] = mod
 
 
-func module_set_output_level(module_name: StringName, new_level: Level) -> void:
+func module_set_output_level(module_name: StringName, new_level: LogLevel) -> void:
 	var mod := __get_module(module_name)
 	mod.level = new_level
 
 
-func module_get_output_level(module_name: StringName) -> Level:
+func module_get_output_level(module_name: StringName) -> LogLevel:
 	var mod := __get_module(module_name)
-	return mod.level as Level
+	return mod.level as LogLevel
 
 
 func module_set_output_flags(module_name: StringName, flags: int) -> void:
@@ -210,11 +210,11 @@ func _ready() -> void:
 	if not _log_path.ends_with("/"):
 		_log_path += "/"
 	_log_path += ProjectSettings.get_setting("addons/simple_logger/log_file/name", "game.log")
-	var def_level: Level = ProjectSettings.get_setting(
-		"addons/simple_logger/output_level", Level.VERBOSE)
+	var def_level: LogLevel = ProjectSettings.get_setting(
+		"addons/simple_logger/output_level", LogLevel.VERBOSE)
 	var def_output: int = ProjectSettings.get_setting(
 		"addons/simple_logger/output_action", OUTPUT_PRINT | OUTPUT_FILE)
-	add_module(LOGGER_MODULE, Level.VERBOSE, OUTPUT_ALL)
+	add_module(LOGGER_MODULE, LogLevel.VERBOSE, OUTPUT_ALL)
 	var def_module: LogModule = LogModule.new(def_level, def_output)
 	if def_output & OUTPUT_FILE:
 		var log_file := __get_log_file(_log_path)
@@ -279,7 +279,7 @@ func __get_log_file(path: String) -> FileAccess:
 
 
 func __verbose(mod: LogModule, message: String) -> void:
-	if not _allow_verbose or not mod.is_output_allowed(Level.VERBOSE):
+	if not _allow_verbose or not mod.is_output_allowed(LogLevel.VERBOSE):
 		return
 	var m: String = mod.prepend_name(message)
 	if mod.is_print_output():
@@ -291,9 +291,9 @@ func __verbose(mod: LogModule, message: String) -> void:
 
 
 func __debug(mod: LogModule, message: String) -> void:
-	if not _allow_debug or not mod.is_output_allowed(Level.DEBUG):
+	if not _allow_debug or not mod.is_output_allowed(LogLevel.DEBUG):
 		return
-	var level := _LEVELS[Level.DEBUG]
+	var level := _LEVELS[LogLevel.DEBUG]
 	if mod.is_print_output():
 		var m := mod.prepend_name("[color=yellow]%s[/color] %s" % [level, message])
 		print_rich(m)
@@ -307,9 +307,9 @@ func __debug(mod: LogModule, message: String) -> void:
 
 
 func __info(mod: LogModule, message: String) -> void:
-	if not _allow_info or not mod.is_output_allowed(Level.INFO):
+	if not _allow_info or not mod.is_output_allowed(LogLevel.INFO):
 		return
-	var level := _LEVELS[Level.INFO]
+	var level := _LEVELS[LogLevel.INFO]
 	if mod.is_print_output():
 		var m := mod.prepend_name("[color=yellow]%s[/color] %s" % [level, message])
 		print_rich(m)
@@ -321,9 +321,9 @@ func __info(mod: LogModule, message: String) -> void:
 
 
 func __warning(mod: LogModule, message: String) -> void:
-	if not _allow_warn or not mod.is_output_allowed(Level.WARN):
+	if not _allow_warn or not mod.is_output_allowed(LogLevel.WARN):
 		return
-	var level := _LEVELS[Level.WARN]
+	var level := _LEVELS[LogLevel.WARN]
 	if mod.is_print_output():
 		push_warning(message)
 	if mod.is_file_output():
@@ -334,9 +334,9 @@ func __warning(mod: LogModule, message: String) -> void:
 
 
 func __error(mod: LogModule, message: String) -> void:
-	if not _allow_error or not mod.is_output_allowed(Level.ERROR):
+	if not _allow_error or not mod.is_output_allowed(LogLevel.ERROR):
 		return
-	var level := _LEVELS[Level.ERROR]
+	var level := _LEVELS[LogLevel.ERROR]
 	if mod.is_print_output():
 		push_error(message)
 		print_stack()
@@ -349,9 +349,9 @@ func __error(mod: LogModule, message: String) -> void:
 
 
 func __fatal(mod: LogModule, message: String) -> void:
-	if not mod.is_output_allowed(Level.FATAL):
+	if not mod.is_output_allowed(LogLevel.FATAL):
 		return
-	var level := _LEVELS[Level.FATAL]
+	var level := _LEVELS[LogLevel.FATAL]
 	if mod.is_print_output():
 		push_error(message)
 		print_stack()
@@ -371,7 +371,7 @@ func __add_console_message(message: String, module_name: String, level: String, 
 	_console.pop()
 	_console.add_text(message + "\n")
 
-#func __create_module(output_level: Level, output_flags: int, mod_name := "")  -> LogModule:
+#func __create_module(output_level: LogLevel, output_flags: int, mod_name := "")  -> LogModule:
 	#var mod: LogModule = LogModule.new()
 	#mod.level = output_level
 	#mod.output = output_flags

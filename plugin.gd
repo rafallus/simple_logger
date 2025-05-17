@@ -22,14 +22,14 @@ func _enter_tree() -> void:
 	# Add project settings.
 	if not ProjectSettings.has_setting(ADDON_PREFIX + "output_level"):
 		ProjectSettings.set_setting(ADDON_PREFIX + "output_level",
-			LoggerScript.Level.VERBOSE)
+			LoggerScript.LogLevel.VERBOSE)
 		ProjectSettings.add_property_info({
 			name = ADDON_PREFIX + "output_level",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
 			hint_string = "Verbose,Debug,Info,Warning,Error,Fatal"
 		})
-		ProjectSettings.set_initial_value(ADDON_PREFIX + "output_level", LoggerScript.Level.VERBOSE)
+		ProjectSettings.set_initial_value(ADDON_PREFIX + "output_level", LoggerScript.LogLevel.VERBOSE)
 	if not ProjectSettings.has_setting(ADDON_PREFIX + "output_action"):
 		ProjectSettings.set_setting(ADDON_PREFIX + "output_action",
 			LoggerScript.OUTPUT_FILE | LoggerScript.OUTPUT_PRINT)
