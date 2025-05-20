@@ -59,8 +59,10 @@ func _enter_tree() -> void:
 		ProjectSettings.set_initial_value(ADDON_PREFIX + "log_file/path",
 			LoggerScript.DEFAULT_LOG_DIR)
 	if not ProjectSettings.has_setting(ADDON_PREFIX + "log_file/name"):
+		var app_name: String = ProjectSettings.get_setting("application/config/name")
+		app_name = app_name.replace_char(32, 95)
 		ProjectSettings.set_setting(ADDON_PREFIX + "log_file/name",
-			ProjectSettings.get_setting("application/config/name") + "_{index}.log")
+			app_name + "_{index}.log")
 		ProjectSettings.add_property_info({
 			name = ADDON_PREFIX + "log_file/name",
 			type = TYPE_STRING
