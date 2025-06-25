@@ -7,6 +7,16 @@ extends Node
 ##
 ##
 
+class BenchmarkData:
+	var running := false
+	var current_time := 0
+	var last_tick := -1
+
+	func reset() -> void:
+		running = false
+		current_time = 0
+		last_tick = -1
+
 var _benchmarks := {}
 var _def_benchmark := BenchmarkData.new()
 
@@ -66,17 +76,3 @@ func __get_benchmark(benchmark: StringName) -> BenchmarkData:
 
 # =============================================================
 # ========= Signal Callbacks ==================================
-
-
-# =============================================================
-# ========= Internal Classes ==================================
-
-class BenchmarkData:
-	var running := false
-	var current_time := 0
-	var last_tick := -1
-
-	func reset() -> void:
-		running = false
-		current_time = 0
-		last_tick = -1
