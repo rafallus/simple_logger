@@ -26,7 +26,7 @@ extends Node
 # =============================================================
 # ========= Public Functions ==================================
 
-func checkerr(err: int, fatal := false, message := "") -> bool:
+func checkerr(err: int, fatal: bool = false, message: String = "") -> bool:
 	if err != OK:
 		if fatal:
 			Log.fatal(message, err)
@@ -36,7 +36,7 @@ func checkerr(err: int, fatal := false, message := "") -> bool:
 	return true
 
 
-func notifyerr(err: int, fatal := false, message := "") -> void:
+func notifyerr(err: int, fatal: bool = false, message: String = "") -> void:
 	if err != OK:
 		if fatal:
 			Log.fatal(message, err)
@@ -44,7 +44,7 @@ func notifyerr(err: int, fatal := false, message := "") -> void:
 			Log.fatal(message, err)
 
 
-func check(arg: bool, message: String, fatal := false) -> bool:
+func check(arg: bool, message: String, fatal: bool = false) -> bool:
 	if not arg:
 		if fatal:
 			Log.fatal(message)
@@ -52,6 +52,14 @@ func check(arg: bool, message: String, fatal := false) -> bool:
 			Log.error(message)
 		return false
 	return true
+
+
+func scheck(arg: bool, message: String, fatal: bool = false) -> void:
+	if not arg:
+		if fatal:
+			Log.fatal(message)
+		else:
+			Log.error(message)
 
 
 func check_resize(err: int) -> void:
