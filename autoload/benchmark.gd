@@ -9,23 +9,25 @@ extends Node
 
 class BenchmarkData:
 	var running := false
-	var current_time := 0
-	var last_tick := -1
+	var current_time: int = 0
+	var last_tick: int = -1
 
 	func reset() -> void:
 		running = false
 		current_time = 0
 		last_tick = -1
 
-var _benchmarks := {}
-var _def_benchmark := BenchmarkData.new()
+var _benchmarks: Dictionary[StringName, BenchmarkData] = {}
+var _def_benchmark: BenchmarkData = BenchmarkData.new()
+var _cached_benchmark: BenchmarkData
+var _cached: StringName
 
 
 # =============================================================
 # ========= Public Functions ==================================
 
 func start(benchmark: StringName = &"") -> void:
-	var b := __get_benchmark(benchmark)
+	var b: BenchmarkData = _cached_benchmark if _cached == benchmark else __get_benchmark(benchmark)
 	if b.running:
 		pass # Error
 		return
@@ -34,7 +36,7 @@ func start(benchmark: StringName = &"") -> void:
 
 
 func stop(benchmark: StringName = &"") -> void:
-	var b := __get_benchmark(benchmark)
+	var b: BenchmarkData = _cached_benchmark if _cached == benchmark else __get_benchmark(benchmark)
 	if not b.running:
 		pass # Error
 		return
@@ -44,7 +46,7 @@ func stop(benchmark: StringName = &"") -> void:
 
 
 func pause(benchmark: StringName = &"") -> void:
-	var b := __get_benchmark(benchmark)
+	var b: BenchmarkData = _cached_benchmark if _cached == benchmark else __get_benchmark(benchmark)
 	if not b.running:
 		pass # Error
 		return
@@ -69,9 +71,11 @@ func __get_benchmark(benchmark: StringName) -> BenchmarkData:
 	if benchmark.is_empty():
 		b = _def_benchmark
 	else:
-		b = _benchmarks.get(benchmark)
+		b = _benchmarks.get(benchmark, null)
 		if not b:
 			b = BenchmarkData.new()
+			_benchmarks[benchmark] = b
+	_cached_benchmark = b
 	return b
 
 # =============================================================
