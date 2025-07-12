@@ -26,7 +26,7 @@ extends Node
 # =============================================================
 # ========= Public Functions ==================================
 
-func checkerr(err: int, fatal: bool = false, message: String = "") -> bool:
+func checkerr(err: int, message: String = "", fatal: bool = false) -> bool:
 	if err != OK:
 		if fatal:
 			Log.fatal(message, err)
@@ -36,7 +36,7 @@ func checkerr(err: int, fatal: bool = false, message: String = "") -> bool:
 	return true
 
 
-func notifyerr(err: int, fatal: bool = false, message: String = "") -> void:
+func notifyerr(err: int, message: String = "", fatal: bool = false) -> void:
 	if err != OK:
 		if fatal:
 			Log.fatal(message, err)
